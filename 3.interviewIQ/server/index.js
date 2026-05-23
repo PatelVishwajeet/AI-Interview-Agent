@@ -15,7 +15,12 @@ const allowedOrigins = [
     "http://127.0.0.1:5173",
     "http://localhost:5174",
     "http://127.0.0.1:5174",
+    "https://ai-interview-agent-frontend-2aqn.onrender.com",
 ]
+
+if (process.env.CLIENT_URL) {
+    allowedOrigins.push(...process.env.CLIENT_URL.split(",").map((origin) => origin.trim()).filter(Boolean))
+}
 
 app.use(cors({
     origin(origin, callback) {
