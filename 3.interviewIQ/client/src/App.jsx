@@ -10,7 +10,7 @@ import InterviewReport from './pages/InterviewReport'
 import Pricing from './pages/Pricing'
 import { setUserData } from './redux/userSlice'
 
-export const ServerUrl = "http://localhost:8000"
+export const ServerUrl = "https://fullstackinterviewagent-backend.onrender.com"
 
 function App() {
 
