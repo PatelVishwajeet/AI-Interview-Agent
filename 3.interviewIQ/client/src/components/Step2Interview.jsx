@@ -3,11 +3,11 @@ import femaleVideo from "../assets/videos/female-ai.mp4"
 import Timer from './Timer'
 import { motion as Motion } from "motion/react"
 import { FaMicrophone, FaMicrophoneSlash } from "react-icons/fa";
-import { useState } from 'react'
+import { useCallback, useState } from 'react'
 import { useRef } from 'react'
 import { useEffect } from 'react'
 import axios from "axios"
-import { ServerUrl } from '../App'
+import { ServerUrl } from '../config'
 import { BsArrowRight } from 'react-icons/bs'
 
 function Step2Interview({ interviewData, onFinish }) {
@@ -83,7 +83,7 @@ function Step2Interview({ interviewData, onFinish }) {
 
   const videoSource = voiceGender === "male" ? maleVideo : femaleVideo;
 
-  const startMic = () => {
+  const startMic = useCallback(() => {
     if (recognitionRef.current && !isAIPlaying) {
       try {
         recognitionRef.current.start();
@@ -91,17 +91,17 @@ function Step2Interview({ interviewData, onFinish }) {
         console.debug("Speech recognition start skipped:", error);
       }
     }
-  };
+  }, [isAIPlaying]);
 
-  const stopMic = () => {
+  const stopMic = useCallback(() => {
     if (recognitionRef.current) {
       recognitionRef.current.stop();
     }
-  };
+  }, []);
 
 
   /* ---------------- SPEAK FUNCTION ---------------- */
-  const speakText = (text) => {
+  const speakText = useCallback((text) => {
     return new Promise((resolve) => {
       if (!window.speechSynthesis || !selectedVoice) {
         resolve();
@@ -152,7 +152,7 @@ function Step2Interview({ interviewData, onFinish }) {
 
       window.speechSynthesis.speak(utterance);
     });
-  };
+  }, [isMicOn, selectedVoice, startMic, stopMic]);
 
   useEffect(() => {
     startMicRef.current = startMic;
@@ -247,7 +247,7 @@ function Step2Interview({ interviewData, onFinish }) {
   };
 
 
-  const submitAnswer = async () => {
+  const submitAnswer = useCallback(async () => {
     if (isSubmitting) return;
     stopMic()
     setIsSubmitting(true)
@@ -268,7 +268,7 @@ function Step2Interview({ interviewData, onFinish }) {
 console.log(error)
 setIsSubmitting(false)
     }
-  }
+  }, [answer, currentIndex, currentQuestion, interviewId, isSubmitting, speakText, stopMic, timeLeft])
 
   useEffect(() => {
     submitAnswerRef.current = submitAnswer;

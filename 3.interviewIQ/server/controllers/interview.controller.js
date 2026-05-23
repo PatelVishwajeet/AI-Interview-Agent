@@ -4,6 +4,34 @@ import { askAi } from "../services/openRouter.service.js";
 import User from "../models/user.model.js";
 import Interview from "../models/interview.model.js";
 
+const removeUploadedFile = async (filepath) => {
+  if (!filepath || !fs.existsSync(filepath)) return;
+  await fs.promises.unlink(filepath);
+};
+
+const parseAiJson = (text) => {
+  if (!text || typeof text !== "string") {
+    throw new Error("AI response is empty.");
+  }
+
+  const trimmed = text.trim();
+  const fencedMatch = trimmed.match(/```(?:json)?\s*([\s\S]*?)```/i);
+  const jsonText = fencedMatch?.[1]?.trim() || trimmed;
+
+  try {
+    return JSON.parse(jsonText);
+  } catch {
+    const start = jsonText.indexOf("{");
+    const end = jsonText.lastIndexOf("}");
+
+    if (start === -1 || end === -1 || end <= start) {
+      throw new Error("AI response did not contain valid JSON.");
+    }
+
+    return JSON.parse(jsonText.slice(start, end + 1));
+  }
+};
+
 export const analyzeResume = async (req, res) => {
   try {
     if (!req.file) {
@@ -15,6 +43,7 @@ export const analyzeResume = async (req, res) => {
     try {
       fileBuffer = await fs.promises.readFile(filepath)
     } catch (error) {
+      await removeUploadedFile(filepath);
       return res.status(400).json({ message: "Failed to read uploaded file." });
     }
 
@@ -24,6 +53,7 @@ export const analyzeResume = async (req, res) => {
     try {
       pdf = await pdfjsLib.getDocument({ data: uint8Array }).promise;
     } catch (error) {
+      await removeUploadedFile(filepath);
       return res.status(400).json({ message: "Failed to parse PDF. Please upload a valid PDF file." });
     }
 
@@ -44,6 +74,7 @@ export const analyzeResume = async (req, res) => {
       .trim();
 
     if (!resumeText) {
+      await removeUploadedFile(filepath);
       return res.status(400).json({ message: "No text found in PDF. Please upload a text-based PDF." });
     }
 
@@ -73,7 +104,7 @@ Skills: [skill1, skill2]
     let parsed = {};
     try {
       // Try to parse as JSON first
-      parsed = JSON.parse(aiResponse);
+      parsed = parseAiJson(aiResponse);
     } catch (error) {
       // If not JSON, parse as text
       const lines = aiResponse.split('\n');
@@ -100,7 +131,7 @@ Skills: [skill1, skill2]
       }
     }
 
-    fs.unlinkSync(filepath)
+    await removeUploadedFile(filepath)
 
 
     res.json({
@@ -115,7 +146,7 @@ Skills: [skill1, skill2]
     console.error(error);
 
     if (req.file && fs.existsSync(req.file.path)) {
-      fs.unlinkSync(req.file.path);
+      await removeUploadedFile(req.file.path);
     }
 
     return res.status(500).json({ message: error.message });
@@ -327,7 +358,7 @@ Answer: ${answer}
     const aiResponse = await askAi(messages)
 
 
-    const parsed = JSON.parse(aiResponse);
+    const parsed = parseAiJson(aiResponse);
 
     question.answer = answer;
     question.confidence = parsed.confidence;

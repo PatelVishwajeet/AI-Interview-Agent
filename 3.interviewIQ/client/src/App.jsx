@@ -9,8 +9,7 @@ import InterviewPage from './pages/InterviewPage'
 import InterviewReport from './pages/InterviewReport'
 import Pricing from './pages/Pricing'
 import { setUserData } from './redux/userSlice'
-
-export const ServerUrl = "http://localhost:8000"
+import { ServerUrl } from './config'
 
 function App() {
 

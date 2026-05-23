@@ -3,11 +3,11 @@ import { initializeApp } from "firebase/app";
 import {getAuth, GoogleAuthProvider} from "firebase/auth"
 const firebaseConfig = {
   apiKey: import.meta.env.VITE_FIREBASE_APIKEY,
-  authDomain: "mern-1b35c.firebaseapp.com",
-  projectId: "mern-1b35c",
-  storageBucket: "mern-1b35c.firebasestorage.app",
-  messagingSenderId: "1009739279485",
-  appId: "1:1009739279485:web:9805608c8b9fdafd291514"
+  authDomain: "fullstackproject-20c56.firebaseapp.com",
+  projectId: "fullstackproject-20c56",
+  storageBucket: "fullstackproject-20c56.firebasestorage.app",
+  messagingSenderId: "727170858112",
+  appId: "1:727170858112:web:81a9197ffe6a86e1a4ba65"
 };
 
 const app = initializeApp(firebaseConfig);

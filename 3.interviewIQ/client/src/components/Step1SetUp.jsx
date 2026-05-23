@@ -9,7 +9,7 @@ import {
 } from "react-icons/fa";
 import { useState } from 'react';
 import axios from "axios"
-import { ServerUrl } from '../App';
+import { ServerUrl } from '../config';
 import { useDispatch, useSelector } from 'react-redux';
 import { setUserData } from '../redux/userSlice';
 function Step1SetUp({ onStart }) {
